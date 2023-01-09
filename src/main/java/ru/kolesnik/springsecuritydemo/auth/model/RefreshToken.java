@@ -13,7 +13,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "refresh_token")
+@Table(name = "refresh_tokens")
 public class RefreshToken {
 
     @Id
