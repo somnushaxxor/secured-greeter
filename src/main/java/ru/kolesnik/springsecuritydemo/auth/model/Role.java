@@ -41,4 +41,11 @@ public class Role implements GrantedAuthority {
         return getClass().hashCode();
     }
 
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "(" +
+                "id = " + id + ", " +
+                "name = " + name + ")";
+    }
+
 }

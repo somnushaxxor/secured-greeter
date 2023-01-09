@@ -40,4 +40,11 @@ public class RefreshToken {
         return getClass().hashCode();
     }
 
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "(" +
+                "id = " + id + ", " +
+                "token = " + token + ")";
+    }
+
 }
