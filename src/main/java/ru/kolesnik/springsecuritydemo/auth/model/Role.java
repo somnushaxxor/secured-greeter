@@ -1,11 +1,11 @@
 package ru.kolesnik.springsecuritydemo.auth.model;
 
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.Hibernate;
 import org.springframework.security.core.GrantedAuthority;
 
-import javax.persistence.*;
 import java.util.Collection;
 import java.util.Objects;
 

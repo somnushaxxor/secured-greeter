@@ -11,7 +11,7 @@ import ru.kolesnik.springsecuritydemo.auth.dto.SignUpRequest;
 import ru.kolesnik.springsecuritydemo.auth.dto.TokenResponse;
 import ru.kolesnik.springsecuritydemo.auth.service.AuthenticationService;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 @RequiredArgsConstructor
 @RestController
