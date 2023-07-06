@@ -1,11 +1,11 @@
 package ru.kolesnik.securedgreeter.auth.model;
 
+import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.Hibernate;
+import org.hibernate.proxy.HibernateProxy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import jakarta.persistence.*;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -21,16 +21,23 @@ public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private Long id;
+
     @Column(name = "first_name", nullable = false)
     private String firstName;
+
     @Column(name = "last_name", nullable = false)
     private String lastName;
-    @Column(nullable = false, unique = true)
+
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
-    @Column(nullable = false)
+
+    @Column(name = "password", nullable = false)
     private String password;
-    @ManyToMany(fetch = FetchType.EAGER)
+
+    @ToString.Exclude
+    @ManyToMany
     @JoinTable(
             name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -74,15 +81,20 @@ public class User implements UserDetails {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        if (o == null) return false;
+        Class<?> oEffectiveClass = o instanceof HibernateProxy ?
+                ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy ?
+                ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
         User user = (User) o;
-        return id != null && Objects.equals(id, user.id);
+        return getId() != null && Objects.equals(getId(), user.getId());
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return getClass().hashCode();
     }
 
