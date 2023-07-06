@@ -3,13 +3,15 @@ package ru.kolesnik.securedgreeter.auth.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.kolesnik.securedgreeter.auth.config.TokenConfigProperties;
+import ru.kolesnik.securedgreeter.auth.exception.NotFoundException;
 import ru.kolesnik.securedgreeter.auth.exception.RefreshTokenExpiredException;
-import ru.kolesnik.securedgreeter.auth.exception.RefreshTokenNotFoundException;
 import ru.kolesnik.securedgreeter.auth.model.RefreshToken;
 import ru.kolesnik.securedgreeter.auth.model.User;
 import ru.kolesnik.securedgreeter.auth.repository.RefreshTokenRepository;
 
-import java.util.Date;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -24,8 +26,12 @@ public class UuidRefreshTokenService implements RefreshTokenService {
         RefreshToken refreshToken = RefreshToken
                 .builder()
                 .token(UUID.randomUUID().toString())
-                .expirationDate(
-                        new Date(System.currentTimeMillis() + tokenConfigProperties.getRefresh().getDuration().toMillis())
+                .expirationTime(
+                        LocalDateTime.ofInstant(
+                                Instant.ofEpochMilli(System.currentTimeMillis() +
+                                        tokenConfigProperties.getRefresh().getDuration().toMillis()),
+                                ZoneId.systemDefault()
+                        )
                 )
                 .owner(user)
                 .build();
@@ -36,7 +42,7 @@ public class UuidRefreshTokenService implements RefreshTokenService {
     @Override
     public RefreshToken updateToken(String token) {
         final RefreshToken oldRefreshToken = refreshTokenRepository.findByToken(token)
-                .orElseThrow(RefreshTokenNotFoundException::new);
+                .orElseThrow(() -> new NotFoundException("Refresh token does not exist!"));
         refreshTokenRepository.delete(oldRefreshToken);
         if (isTokenExpired(oldRefreshToken)) {
             throw new RefreshTokenExpiredException();
@@ -44,8 +50,12 @@ public class UuidRefreshTokenService implements RefreshTokenService {
         RefreshToken newRefreshToken = RefreshToken
                 .builder()
                 .token(UUID.randomUUID().toString())
-                .expirationDate(
-                        new Date(System.currentTimeMillis() + tokenConfigProperties.getRefresh().getDuration().toMillis())
+                .expirationTime(
+                        LocalDateTime.ofInstant(
+                                Instant.ofEpochMilli(System.currentTimeMillis() +
+                                        tokenConfigProperties.getRefresh().getDuration().toMillis()),
+                                ZoneId.systemDefault()
+                        )
                 )
                 .owner(oldRefreshToken.getOwner())
                 .build();
@@ -54,7 +64,7 @@ public class UuidRefreshTokenService implements RefreshTokenService {
     }
 
     private boolean isTokenExpired(RefreshToken refreshToken) {
-        return refreshToken.getExpirationDate().before(new Date());
+        return refreshToken.getExpirationTime().isBefore(LocalDateTime.now());
     }
 
 }

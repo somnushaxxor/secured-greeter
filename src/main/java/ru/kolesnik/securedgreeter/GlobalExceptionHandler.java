@@ -5,20 +5,25 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.kolesnik.securedgreeter.auth.exception.*;
+import ru.kolesnik.securedgreeter.auth.exception.AccessTokenException;
+import ru.kolesnik.securedgreeter.auth.exception.EmailAlreadyInUseException;
+import ru.kolesnik.securedgreeter.auth.exception.NotFoundException;
+import ru.kolesnik.securedgreeter.auth.exception.RefreshTokenExpiredException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    private static final String INTERNAL_SERVER_ERROR_MESSAGE = "Something went wrong :(";
+
+    @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(EmailAlreadyInUseException.class)
     public ErrorMessage handleEmailAlreadyInUseException(EmailAlreadyInUseException e) {
         return new ErrorMessage(e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(RefreshTokenNotFoundException.class)
-    public ErrorMessage handleRefreshTokenNotFoundException(RefreshTokenNotFoundException e) {
+    @ExceptionHandler(NotFoundException.class)
+    public ErrorMessage handleNotFoundException(NotFoundException e) {
         return new ErrorMessage(e.getMessage());
     }
 
@@ -29,14 +34,8 @@ public class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(AccessTokenExpiredException.class)
-    public ErrorMessage handleAccessTokenExpiredException(AccessTokenExpiredException e) {
-        return new ErrorMessage(e.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(UnsupportedAccessTokenException.class)
-    public ErrorMessage handleUnsupportedAccessTokenException(UnsupportedAccessTokenException e) {
+    @ExceptionHandler(AccessTokenException.class)
+    public ErrorMessage handleAccessTokenException(AccessTokenException e) {
         return new ErrorMessage(e.getMessage());
     }
 
@@ -49,7 +48,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public ErrorMessage handleException(Exception e) {
-        return new ErrorMessage(e.getMessage());
+        return new ErrorMessage(INTERNAL_SERVER_ERROR_MESSAGE);
     }
 
 }

@@ -1,13 +1,15 @@
 package ru.kolesnik.securedgreeter.auth.service;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import ru.kolesnik.securedgreeter.auth.config.TokenConfigProperties;
-import ru.kolesnik.securedgreeter.auth.exception.AccessTokenExpiredException;
-import ru.kolesnik.securedgreeter.auth.exception.UnsupportedAccessTokenException;
+import ru.kolesnik.securedgreeter.auth.exception.AccessTokenException;
 
 import java.security.Key;
 import java.util.Date;
@@ -33,22 +35,13 @@ public class JwtAccessTokenService implements AccessTokenService {
     }
 
     @Override
-    public Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
-    }
-
-    @Override
-    public void checkTokenValid(String token) {
-        isTokenExpired(token);
+    public void checkTokenValidity(String token) {
+        extractAllClaims(token);
     }
 
     @Override
     public String generateToken(UserDetails userDetails) {
         return generateToken(new HashMap<>(), userDetails);
-    }
-
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
     }
 
     private String generateToken(Map<String, Object> claims, UserDetails userDetails) {
@@ -77,10 +70,8 @@ public class JwtAccessTokenService implements AccessTokenService {
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
-        } catch (ExpiredJwtException e) {
-            throw new AccessTokenExpiredException();
         } catch (JwtException e) {
-            throw new UnsupportedAccessTokenException();
+            throw new AccessTokenException(e);
         }
     }
 

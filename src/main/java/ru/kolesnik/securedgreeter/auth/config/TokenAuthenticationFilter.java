@@ -14,8 +14,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
-import ru.kolesnik.securedgreeter.auth.exception.AccessTokenExpiredException;
-import ru.kolesnik.securedgreeter.auth.exception.UnsupportedAccessTokenException;
+import ru.kolesnik.securedgreeter.auth.exception.AccessTokenException;
 import ru.kolesnik.securedgreeter.auth.service.AccessTokenService;
 
 import java.io.IOException;
@@ -40,8 +39,8 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         }
         final String token = authHeader.substring(BEARER_PREFIX.length());
         try {
-            accessTokenService.checkTokenValid(token);
-        } catch (AccessTokenExpiredException | UnsupportedAccessTokenException e) {
+            accessTokenService.checkTokenValidity(token);
+        } catch (AccessTokenException e) {
             handlerExceptionResolver.resolveException(request, response, null, e);
             return;
         }

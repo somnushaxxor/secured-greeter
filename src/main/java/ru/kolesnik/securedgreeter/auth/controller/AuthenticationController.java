@@ -1,5 +1,6 @@
 package ru.kolesnik.securedgreeter.auth.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,8 +11,7 @@ import ru.kolesnik.securedgreeter.auth.dto.SignInRequest;
 import ru.kolesnik.securedgreeter.auth.dto.SignUpRequest;
 import ru.kolesnik.securedgreeter.auth.dto.TokenResponse;
 import ru.kolesnik.securedgreeter.auth.service.AuthenticationService;
-
-import jakarta.validation.Valid;
+import ru.kolesnik.securedgreeter.auth.service.UserService;
 
 @RequiredArgsConstructor
 @RestController
@@ -19,10 +19,11 @@ import jakarta.validation.Valid;
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
+    private final UserService userService;
 
     @PostMapping("/sign-up")
     public void signUp(@Valid @RequestBody SignUpRequest request) {
-        authenticationService.addUser(request);
+        userService.addUser(request);
     }
 
     @PostMapping("/sign-in")
