@@ -1,7 +1,6 @@
 package ru.kolesnik.securedgreeter;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -12,8 +11,6 @@ import ru.kolesnik.securedgreeter.auth.exception.RefreshTokenExpiredException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
-    private static final String INTERNAL_SERVER_ERROR_MESSAGE = "Something went wrong :(";
 
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(EmailAlreadyInUseException.class)
@@ -35,20 +32,7 @@ public class GlobalExceptionHandler {
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(AccessTokenException.class)
-    public ErrorMessage handleAccessTokenException(AccessTokenException e) {
-        return new ErrorMessage(e.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(AuthenticationException.class)
-    public ErrorMessage handleAuthenticationException(AuthenticationException e) {
-        return new ErrorMessage(e.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(Exception.class)
-    public ErrorMessage handleException(Exception e) {
-        return new ErrorMessage(INTERNAL_SERVER_ERROR_MESSAGE);
+    public void handleAccessTokenException(AccessTokenException e) {
     }
 
 }

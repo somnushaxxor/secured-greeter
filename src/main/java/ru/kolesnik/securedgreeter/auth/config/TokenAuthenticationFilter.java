@@ -37,7 +37,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        final String token = authHeader.substring(BEARER_PREFIX.length());
+        final String token = getBearerToken(authHeader);
         try {
             accessTokenService.checkTokenValidity(token);
         } catch (AccessTokenException e) {
@@ -54,6 +54,10 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authToken);
         }
         filterChain.doFilter(request, response);
+    }
+
+    private String getBearerToken(String authHeader) {
+        return authHeader.substring(BEARER_PREFIX.length());
     }
 
 }
